@@ -3,7 +3,7 @@
 #eSense BLE Sensor Data
 
 devices=$(bluetoothctl&)
-eSense="$(echo "$devices" | grep 'eSense')"
+eSense="$(echo "$devices" | grep 'eSense-0')"
 echo "$eSense"
 eSenseMAC="$(echo "$eSense" | grep -o '[0-9A-F]\{2\}\(:[0-9A-F]\{2\}\)\{5\}')"
 echo "$eSenseMAC"
