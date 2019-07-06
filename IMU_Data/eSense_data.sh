@@ -2,13 +2,24 @@
 
 #eSense BLE Sensor Data
 
+declare -a IMU_Val
+
 devices=$(bluetoothctl&)
 eSense="$(echo "$devices" | grep 'eSense-0')"
-echo "$eSense"
+# echo "$eSense"
 eSenseMAC="$(echo "$eSense" | grep -o '[0-9A-F]\{2\}\(:[0-9A-F]\{2\}\)\{5\}')"
-echo "$eSenseMAC"
+# echo "$eSenseMAC"
 
-gatttool -b "$eSenseMAC" --char-write-req -a '0x000c' -n 5367020164 --listen
-#gatttool -b "$eSenseMAC" --char-read -a 0x000c
+# Activate IMU 
+gatttool -b "$eSenseMAC" --char-write-req -a '0x000c' -n 5367020164
 
-#gatttool --help-all
+IMU_HEX(){
+	
+	HEX_Data="$(gatttool -b "$eSenseMAC" --char-read -a '0x000e')"
+	# IMU_Val+=(HEX_Data)
+}
+	
+
+IMU_HEX
+echo $HEX_Data
+
