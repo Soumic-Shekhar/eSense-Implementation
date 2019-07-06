@@ -23,6 +23,9 @@ IMU_HEX(){
 }
 	
 
-IMU_HEX
-echo $HEX_Data
+for (( ; ; ))
+	do
+		IMU_HEX
+		echo $HEX_Data
+	done
 
