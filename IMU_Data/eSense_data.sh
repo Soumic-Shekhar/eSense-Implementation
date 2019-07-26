@@ -19,13 +19,16 @@ gatttool -b "$eSenseMAC" --char-write-req -a '0x000c' -n 5367020164
 IMU_HEX(){
 	
 	HEX_Data="$(gatttool -b "$eSenseMAC" --char-read -a '0x000e')"
+	echo "${HEX_Data:33}"
 	# IMU_Val+=(HEX_Data)
 }
 	
 
-for (( ; ; ))
-	do
-		IMU_HEX
-		echo $HEX_Data
-	done
+
+char_val=$(IMU_HEX)
+echo "$char_val"
+acc="${char_val:30}"
+echo "$acc"
+
+python src/utils/cal_acc.py "$acc"
 
