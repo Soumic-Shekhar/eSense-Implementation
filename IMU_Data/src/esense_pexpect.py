@@ -1,9 +1,20 @@
 import pexpect
-from .utils.cal_acc import acc_convert
- 
+import math
+from utils.cal_acc import acc_convert
+import datetime
+import logging
+from pynput.mouse import Controller
+
+LOG_FILENAME = "{}.log".format(datetime.datetime.now().strftime("%c"))
+
+MOUSE_SPEED = 1
+
+mouse = Controller()
+
+
 DEVICE = "00:04:79:00:0C:DA"
 print(DEVICE)
- 
+
 # Run gatttool interactively.
 
 print("Run gatttool...")
@@ -17,23 +28,40 @@ child.sendline("connect {0}".format(DEVICE))
 child.expect("Connection successful", timeout=5)
 print(" Connected!")
 
+#Create file for logging
+logging.basicConfig(format='%(asctime)s - %(message)s', level=logging.INFO, filename = LOG_FILENAME)
+
 # Start IMU Sampling
 child.sendline("char-write-req 0x000c 5367020164")
 
-#Read line of response
-child.expect("Notification handle = .+\n", timeout=5)
 
+def mouse_move(x, y):
+    
+    x = x * abs(x) * MOUSE_SPEED
+    y = y * abs(y) * MOUSE_SPEED
+    
+    mouse.move(x, y)
 
-#Parse and convert accelerometer data
+while True:
 
-acc_val = child.after[-20:-1]
-print(acc_val)
+    #Read line of response
+    child.expect("Notification handle = .+\n", timeout=5)
 
-acc_x, acc_y, acc_z = acc_convert(acc_val)
+    #Parse and convert accelerometer data
 
-print("Accelerometer Values")
-print("X: {}, Y: {}, Z:{}".format(acc_x, acc_y, acc_z))
-print(math.sqrt(acc_x**2 + acc_y**2 + acc_z**2))
+    acc_val = child.after[-20:-1]
+    print(acc_val)
+
+    acc_x, acc_y, acc_z = acc_convert(acc_val)
+    
+    mouse_move(acc_z, acc_y)
+    
+    output = "X: {}, Y: {}, Z: {}".format(acc_x, acc_y, acc_z)
+    logging.info(output)
+
+    print("Accelerometer Values")
+    print(output)
+#    print(math.sqrt(acc_x**2 + acc_y**2 + acc_z**2))
 
 #Stop IMU Sampling
 
